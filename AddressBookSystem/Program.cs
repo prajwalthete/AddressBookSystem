@@ -37,6 +37,24 @@
                 Email = email
             };
         }
+
+        // UC-2
+
+        private List<Contact> contacts = new List<Contact>();
+
+        public void AddContact(Contact contact)
+        {
+            contacts.Add(contact);
+        }
+
+        public void DisplayContacts()
+        {
+            foreach (var contact in contacts)
+            {
+                Console.WriteLine(contact);
+            }
+        }
+
     }
 
     public class AddressBookMain
@@ -45,6 +63,41 @@
         {
             AddressBookMain addressBook = new AddressBookMain();
             addressBook.DisplayWelcomeMessage();
+
+            AddressBook addressBookInstance = new AddressBook();
+
+            // Adding new contacts
+            Console.WriteLine("\nAdding New Contact:");
+            Console.Write("Enter First Name: ");
+            string firstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name: ");
+            string lastName = Console.ReadLine();
+
+            Console.Write("Enter Address: ");
+            string address = Console.ReadLine();
+
+            Console.Write("Enter City: ");
+            string city = Console.ReadLine();
+
+            Console.Write("Enter State: ");
+            string state = Console.ReadLine();
+
+            Console.Write("Enter Zip: ");
+            string zip = Console.ReadLine();
+
+            Console.Write("Enter Phone Number: ");
+            string phoneNumber = Console.ReadLine();
+
+            Console.Write("Enter Email: ");
+            string email = Console.ReadLine();
+
+            Contact newContact = addressBookInstance.CreateContact(firstName, lastName, address, city, state, zip, phoneNumber, email);
+            addressBookInstance.AddContact(newContact);
+
+            // Display all contacts
+            Console.WriteLine("\nAll Contacts:");
+            addressBookInstance.DisplayContacts();
         }
 
         public void DisplayWelcomeMessage()
