@@ -12,3 +12,4 @@ E:\.NET WORKSPACE-1\Websites1\2023\AddressBookSystem\AddressBookSystem\obj\Debug
 E:\.NET WORKSPACE-1\Websites1\2023\AddressBookSystem\AddressBookSystem\obj\Debug\net8.0\AddressBookSystem.pdb
 E:\.NET WORKSPACE-1\Websites1\2023\AddressBookSystem\AddressBookSystem\obj\Debug\net8.0\AddressBookSystem.genruntimeconfig.cache
 E:\.NET WORKSPACE-1\Websites1\2023\AddressBookSystem\AddressBookSystem\obj\Debug\net8.0\ref\AddressBookSystem.dll
+E:\.NET WORKSPACE-1\Websites1\2023\AddressBookSystem\AddressBookSystem\obj\Debug\net8.0\AddressBookSystem.sourcelink.json
