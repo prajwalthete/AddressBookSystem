@@ -104,22 +104,20 @@
 
     public class AddressBookMain
     {
+        private static Dictionary<string, AddressBook> addressBooks = new Dictionary<string, AddressBook>();
+
         public static void Main(string[] args)
         {
             AddressBookMain addressBook = new AddressBookMain();
             addressBook.DisplayWelcomeMessage();
 
-            AddressBook addressBookInstance = new AddressBook();
             char choice;
-
             do
             {
                 Console.WriteLine("\nChoose an option:");
                 Console.WriteLine("0 - Exit");
-                Console.WriteLine("1 - Get all contacts");
-                Console.WriteLine("2 - Add contacts");
-                Console.WriteLine("3 - Edit contacts");
-                Console.WriteLine("4 - Delete contact");
+                Console.WriteLine("1 - Add new Address Book");
+                Console.WriteLine("2 - Select Address Book");
                 Console.Write("Enter your choice: ");
                 choice = Console.ReadKey().KeyChar;
                 Console.WriteLine();
@@ -127,17 +125,10 @@
                 switch (choice)
                 {
                     case '1':
-                        Console.WriteLine("\nAll Contacts List:");
-                        addressBookInstance.DisplayContacts();
+                        AddAddressBook();
                         break;
                     case '2':
-                        addressBookInstance.AddContact(GetContactDetails());
-                        break;
-                    case '3':
-                        addressBookInstance.EditContactByName();
-                        break;
-                    case '4':
-                        addressBookInstance.DeleteContactByName();
+                        SelectAddressBook();
                         break;
                     case '0':
                         Console.WriteLine("Exiting...");
@@ -147,6 +138,75 @@
                         break;
                 }
             } while (choice != '0');
+        }
+
+        private static void AddAddressBook()
+        {
+            Console.Write("Enter Name for the new Address Book: ");
+            string name = Console.ReadLine();
+            addressBooks.Add(name, new AddressBook());
+            Console.WriteLine($"Address Book '{name}' added successfully.");
+        }
+
+        private static void SelectAddressBook()
+        {
+            Console.WriteLine("\nSelect Address Book:");
+            int count = 1;
+            foreach (var name in addressBooks.Keys)
+            {
+                Console.WriteLine($"{count}. {name}");
+                count++;
+            }
+
+            Console.Write("Enter the number for the Address Book to select: ");
+            int index;
+            if (int.TryParse(Console.ReadLine(), out index) && index > 0 && index <= addressBooks.Count)
+            {
+                string selectedBook = addressBooks.Keys.ElementAt(index - 1);
+                Console.WriteLine($"\nSelected Address Book: {selectedBook}");
+
+                AddressBook selectedAddressBook = addressBooks[selectedBook];
+                char choice;
+                do
+                {
+                    Console.WriteLine("\nChoose an option:");
+                    Console.WriteLine("0 - Back");
+                    Console.WriteLine("1 - Get all contacts");
+                    Console.WriteLine("2 - Add contacts");
+                    Console.WriteLine("3 - Edit contacts");
+                    Console.WriteLine("4 - Delete contact");
+                    Console.Write("Enter your choice: ");
+                    choice = Console.ReadKey().KeyChar;
+                    Console.WriteLine();
+
+                    switch (choice)
+                    {
+                        case '1':
+                            Console.WriteLine("\nAll Contacts List:");
+                            selectedAddressBook.DisplayContacts();
+                            break;
+                        case '2':
+                            selectedAddressBook.AddContact(GetContactDetails());
+                            break;
+                        case '3':
+                            selectedAddressBook.EditContactByName();
+                            break;
+                        case '4':
+                            selectedAddressBook.DeleteContactByName();
+                            break;
+                        case '0':
+                            Console.WriteLine("Going back to main menu...");
+                            break;
+                        default:
+                            Console.WriteLine("Invalid choice. Please enter a valid option.");
+                            break;
+                    }
+                } while (choice != '0');
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection. Please enter a valid number.");
+            }
         }
 
         public static Persons GetContactDetails()

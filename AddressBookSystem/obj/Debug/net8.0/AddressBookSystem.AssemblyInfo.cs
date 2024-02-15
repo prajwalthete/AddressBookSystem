@@ -14,11 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AddressBookSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ab6bb70eb7da2d0dc8669264dc5a7f74d736df8")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de5418d30ce7851a0e4790dc91dccf23756c849d")]
->>>>>>> UC5_feature/add-multiple-persons-console-using-collection
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8ceaa09882538212d85a8f08130000c5acbc8d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("AddressBookSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AddressBookSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
