@@ -88,6 +88,17 @@
 
         public void DeleteContactByName(string firstName, string lastName)
         {
+            // Convert input to lowercase for case-insensitive comparison
+            firstName = firstName.ToLower();
+            lastName = lastName.ToLower();
+
+            // Convert contact names to lowercase for comparison
+            foreach (var contact in contacts)
+            {
+                contact.FirstName = contact.FirstName.ToLower();
+                contact.LastName = contact.LastName.ToLower();
+            }
+
             Contact contactToDelete = FindContactByName(firstName, lastName);
             if (contactToDelete != null)
             {
@@ -115,7 +126,6 @@
 
             AddressBook addressBookInstance = new AddressBook();
 
-            // Adding multiple contacts
             char choice;
             do
             {
@@ -150,6 +160,37 @@
                 Console.Write("Do you want to add another contact? (Y/N): ");
                 choice = Console.ReadKey().KeyChar;
                 Console.WriteLine();
+
+                if (Char.ToUpper(choice) != 'Y')
+                {
+                    Console.Write("Do you want to edit any contact? (Y/N): ");
+                    choice = Console.ReadKey().KeyChar;
+                    Console.WriteLine();
+                    if (Char.ToUpper(choice) == 'Y')
+                    {
+                        Console.Write("Enter First Name of Contact to Edit: ");
+                        string editFirstName = Console.ReadLine();
+
+                        Console.Write("Enter Last Name of Contact to Edit: ");
+                        string editLastName = Console.ReadLine();
+
+                        addressBookInstance.EditContactByName(editFirstName, editLastName);
+                    }
+
+                    Console.Write("Do you want to delete any contact? (Y/N): ");
+                    choice = Console.ReadKey().KeyChar;
+                    Console.WriteLine();
+                    if (Char.ToUpper(choice) == 'Y')
+                    {
+                        Console.Write("Enter First Name of Contact to Delete: ");
+                        string deleteFirstName = Console.ReadLine();
+
+                        Console.Write("Enter Last Name of Contact to Delete: ");
+                        string deleteLastName = Console.ReadLine();
+
+                        addressBookInstance.DeleteContactByName(deleteFirstName, deleteLastName);
+                    }
+                }
             } while (Char.ToUpper(choice) == 'Y');
 
             // Display all contacts
