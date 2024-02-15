@@ -23,6 +23,9 @@
 
     public class AddressBook
     {
+        // UC-2
+        private List<Contact> contacts = new List<Contact>();
+
         public Contact CreateContact(string firstName, string lastName, string address, string city, string state, string zip, string phoneNumber, string email)
         {
             return new Contact
@@ -38,10 +41,6 @@
             };
         }
 
-        // UC-2
-
-        private List<Contact> contacts = new List<Contact>();
-
         public void AddContact(Contact contact)
         {
             contacts.Add(contact);
@@ -55,6 +54,43 @@
             }
         }
 
+        public void EditContactByName(string firstName, string lastName)
+        {
+            Contact contactToEdit = FindContactByName(firstName, lastName);
+            if (contactToEdit != null)
+            {
+                Console.WriteLine("Enter new details:");
+
+                Console.Write("Enter Address: ");
+                contactToEdit.Address = Console.ReadLine();
+
+                Console.Write("Enter City: ");
+                contactToEdit.City = Console.ReadLine();
+
+                Console.Write("Enter State: ");
+                contactToEdit.State = Console.ReadLine();
+
+                Console.Write("Enter Zip: ");
+                contactToEdit.Zip = Console.ReadLine();
+
+                Console.Write("Enter Phone Number: ");
+                contactToEdit.PhoneNumber = Console.ReadLine();
+
+                Console.Write("Enter Email: ");
+                contactToEdit.Email = Console.ReadLine();
+
+                Console.WriteLine("Contact updated successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Contact not found.");
+            }
+        }
+
+        private Contact FindContactByName(string firstName, string lastName)
+        {
+            return contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
+        }
     }
 
     public class AddressBookMain
@@ -97,6 +133,20 @@
 
             // Display all contacts
             Console.WriteLine("\nAll Contacts:");
+            addressBookInstance.DisplayContacts();
+
+            // uc-3 Editing existing contact
+            Console.WriteLine("\nEditing Contact:");
+            Console.Write("Enter First Name of Contact to Edit: ");
+            string editFirstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name of Contact to Edit: ");
+            string editLastName = Console.ReadLine();
+
+            addressBookInstance.EditContactByName(editFirstName, editLastName);
+
+            // Display all contacts after editing
+            Console.WriteLine("\nAll Contacts after Editing:");
             addressBookInstance.DisplayContacts();
         }
 
