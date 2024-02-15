@@ -89,14 +89,15 @@
         public void DeleteContactByName(string firstName, string lastName)
         {
             Contact contactToDelete = FindContactByName(firstName, lastName);
-
-            contacts.Remove(contactToDelete);
-            Console.WriteLine("Contact deleted successfully.");
-
-
-
-            Console.WriteLine("Contact not found.");
-
+            if (contactToDelete != null)
+            {
+                contacts.Remove(contactToDelete);
+                Console.WriteLine("Contact deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Contact not found.");
+            }
         }
 
 
