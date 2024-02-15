@@ -23,7 +23,6 @@
 
     public class AddressBook
     {
-        // UC-2
         private List<Contact> contacts = new List<Contact>();
 
         public Contact CreateContact(string firstName, string lastName, string address, string city, string state, string zip, string phoneNumber, string email)
@@ -87,6 +86,20 @@
             }
         }
 
+        public void DeleteContactByName(string firstName, string lastName)
+        {
+            Contact contactToDelete = FindContactByName(firstName, lastName);
+
+            contacts.Remove(contactToDelete);
+            Console.WriteLine("Contact deleted successfully.");
+
+
+
+            Console.WriteLine("Contact not found.");
+
+        }
+
+
         private Contact FindContactByName(string firstName, string lastName)
         {
             return contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
@@ -135,7 +148,7 @@
             Console.WriteLine("\nAll Contacts:");
             addressBookInstance.DisplayContacts();
 
-            // uc-3 Editing existing contact
+            // Editing existing contact
             Console.WriteLine("\nEditing Contact:");
             Console.Write("Enter First Name of Contact to Edit: ");
             string editFirstName = Console.ReadLine();
@@ -145,8 +158,25 @@
 
             addressBookInstance.EditContactByName(editFirstName, editLastName);
 
+
             // Display all contacts after editing
             Console.WriteLine("\nAll Contacts after Editing:");
+            addressBookInstance.DisplayContacts();
+
+
+
+            // Deleting contact
+            Console.WriteLine("\nDeleting Contact:");
+            Console.Write("Enter First Name of Contact to Delete: ");
+            string deleteFirstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name of Contact to Delete: ");
+            string deleteLastName = Console.ReadLine();
+
+            addressBookInstance.DeleteContactByName(deleteFirstName, deleteLastName);
+
+            // Display all contacts after deletion
+            Console.WriteLine("\nAll Contacts after Deletion:");
             addressBookInstance.DisplayContacts();
         }
 
