@@ -100,7 +100,6 @@
             }
         }
 
-
         private Contact FindContactByName(string firstName, string lastName)
         {
             return contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
@@ -116,68 +115,45 @@
 
             AddressBook addressBookInstance = new AddressBook();
 
-            // Adding new contacts
-            Console.WriteLine("\nAdding New Contact:");
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine();
+            // Adding multiple contacts
+            char choice;
+            do
+            {
+                Console.WriteLine("\nAdding New Contact:");
+                Console.Write("Enter First Name: ");
+                string firstName = Console.ReadLine();
 
-            Console.Write("Enter Last Name: ");
-            string lastName = Console.ReadLine();
+                Console.Write("Enter Last Name: ");
+                string lastName = Console.ReadLine();
 
-            Console.Write("Enter Address: ");
-            string address = Console.ReadLine();
+                Console.Write("Enter Address: ");
+                string address = Console.ReadLine();
 
-            Console.Write("Enter City: ");
-            string city = Console.ReadLine();
+                Console.Write("Enter City: ");
+                string city = Console.ReadLine();
 
-            Console.Write("Enter State: ");
-            string state = Console.ReadLine();
+                Console.Write("Enter State: ");
+                string state = Console.ReadLine();
 
-            Console.Write("Enter Zip: ");
-            string zip = Console.ReadLine();
+                Console.Write("Enter Zip: ");
+                string zip = Console.ReadLine();
 
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine();
+                Console.Write("Enter Phone Number: ");
+                string phoneNumber = Console.ReadLine();
 
-            Console.Write("Enter Email: ");
-            string email = Console.ReadLine();
+                Console.Write("Enter Email: ");
+                string email = Console.ReadLine();
 
-            Contact newContact = addressBookInstance.CreateContact(firstName, lastName, address, city, state, zip, phoneNumber, email);
-            addressBookInstance.AddContact(newContact);
+                Contact newContact = addressBookInstance.CreateContact(firstName, lastName, address, city, state, zip, phoneNumber, email);
+                addressBookInstance.AddContact(newContact);
+
+                Console.Write("Do you want to add another contact? (Y/N): ");
+                choice = Console.ReadKey().KeyChar;
+                Console.WriteLine();
+            } while (Char.ToUpper(choice) == 'Y');
 
             // Display all contacts
             Console.WriteLine("\nAll Contacts:");
-            addressBookInstance.DisplayContacts();
-
-            // Editing existing contact
-            Console.WriteLine("\nEditing Contact:");
-            Console.Write("Enter First Name of Contact to Edit: ");
-            string editFirstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name of Contact to Edit: ");
-            string editLastName = Console.ReadLine();
-
-            addressBookInstance.EditContactByName(editFirstName, editLastName);
-
-
-            // Display all contacts after editing
-            Console.WriteLine("\nAll Contacts after Editing:");
-            addressBookInstance.DisplayContacts();
-
-
-
-            // Deleting contact
-            Console.WriteLine("\nDeleting Contact:");
-            Console.Write("Enter First Name of Contact to Delete: ");
-            string deleteFirstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name of Contact to Delete: ");
-            string deleteLastName = Console.ReadLine();
-
-            addressBookInstance.DeleteContactByName(deleteFirstName, deleteLastName);
-
-            // Display all contacts after deletion
-            Console.WriteLine("\nAll Contacts after Deletion:");
             addressBookInstance.DisplayContacts();
         }
 
