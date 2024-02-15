@@ -1,82 +1,71 @@
 ﻿namespace AddressBookApp
 {
     // UC-1
-    public class Contact
+    public class Persons
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Zip { get; set; }
-        public string PhoneNumber { get; set; }
+        public string First_name { get; set; }
+        public string Last_name { get; set; }
+        public string Number { get; set; }
         public string Email { get; set; }
+        public string Address { get; set; }
 
         public override string ToString()
         {
-            return $"Name: {FirstName} {LastName}\n" +
-                   $"Address: {Address}, {City}, {State} - {Zip}\n" +
-                   $"Phone Number: {PhoneNumber}\n" +
-                   $"Email: {Email}\n";
+            return $"| Name: {First_name} {Last_name} | Mobile: {Number} | Email: {Email} | Address: {Address} |";
         }
     }
 
     public class AddressBook
     {
-        private List<Contact> contacts = new List<Contact>();
+        private List<Persons> contacts = new List<Persons>();
 
-        public Contact CreateContact(string firstName, string lastName, string address, string city, string state, string zip, string phoneNumber, string email)
+        public void AddContact(Persons person)
         {
-            return new Contact
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Address = address,
-                City = city,
-                State = state,
-                Zip = zip,
-                PhoneNumber = phoneNumber,
-                Email = email
-            };
-        }
-
-        public void AddContact(Contact contact)
-        {
-            contacts.Add(contact);
+            contacts.Add(person);
         }
 
         public void DisplayContacts()
         {
-            foreach (var contact in contacts)
+            if (contacts.Count > 0)
             {
-                Console.WriteLine(contact);
+                foreach (var person in contacts)
+                {
+                    Console.WriteLine(person);
+                }
+
             }
+            else { Console.WriteLine("Your Contact list is empty"); }
+
         }
 
-        public void EditContactByName(string firstName, string lastName)
+        public void EditContactByName()
         {
-            Contact contactToEdit = FindContactByName(firstName, lastName);
-            if (contactToEdit != null)
+            Console.WriteLine("\nEditing Contact:");
+            Console.Write("Enter First Name of Contact to Edit: ");
+            string editFirstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name of Contact to Edit: ");
+            string editLastName = Console.ReadLine();
+
+            Persons personToEdit = FindContactByName(editFirstName, editLastName);
+            if (personToEdit != null)
             {
-                Console.WriteLine("Enter new details:");
+                Console.WriteLine("Enter new details to Update:");
+
+                Console.Write("Enter first Name :");
+                personToEdit.First_name = Console.ReadLine();
+
+                Console.Write("Enter last Name :");
+                personToEdit.Last_name = Console.ReadLine();
 
                 Console.Write("Enter Address: ");
-                contactToEdit.Address = Console.ReadLine();
-
-                Console.Write("Enter City: ");
-                contactToEdit.City = Console.ReadLine();
-
-                Console.Write("Enter State: ");
-                contactToEdit.State = Console.ReadLine();
-
-                Console.Write("Enter Zip: ");
-                contactToEdit.Zip = Console.ReadLine();
+                personToEdit.Address = Console.ReadLine();
 
                 Console.Write("Enter Phone Number: ");
-                contactToEdit.PhoneNumber = Console.ReadLine();
+                personToEdit.Number = Console.ReadLine();
 
                 Console.Write("Enter Email: ");
-                contactToEdit.Email = Console.ReadLine();
+                personToEdit.Email = Console.ReadLine();
 
                 Console.WriteLine("Contact updated successfully.");
             }
@@ -86,12 +75,19 @@
             }
         }
 
-        public void DeleteContactByName(string firstName, string lastName)
+        public void DeleteContactByName()
         {
-            Contact contactToDelete = FindContactByName(firstName, lastName);
-            if (contactToDelete != null)
+            Console.WriteLine("\nDeleting Contact:");
+            Console.Write("Enter First Name of Contact to Delete: ");
+            string deleteFirstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name of Contact to Delete: ");
+            string deleteLastName = Console.ReadLine();
+
+            Persons personToDelete = FindContactByName(deleteFirstName, deleteLastName);
+            if (personToDelete != null)
             {
-                contacts.Remove(contactToDelete);
+                contacts.Remove(personToDelete);
                 Console.WriteLine("Contact deleted successfully.");
             }
             else
@@ -100,10 +96,9 @@
             }
         }
 
-
-        private Contact FindContactByName(string firstName, string lastName)
+        private Persons FindContactByName(string firstName, string lastName)
         {
-            return contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
+            return contacts.Find(c => c.First_name.Equals(firstName, StringComparison.OrdinalIgnoreCase) && c.Last_name.Equals(lastName, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -115,8 +110,47 @@
             addressBook.DisplayWelcomeMessage();
 
             AddressBook addressBookInstance = new AddressBook();
+            char choice;
 
-            // Adding new contacts
+            do
+            {
+                Console.WriteLine("\nChoose an option:");
+                Console.WriteLine("0 - Exit");
+                Console.WriteLine("1 - Get all contacts");
+                Console.WriteLine("2 - Add contacts");
+                Console.WriteLine("3 - Edit contacts");
+                Console.WriteLine("4 - Delete contact");
+                Console.Write("Enter your choice: ");
+                choice = Console.ReadKey().KeyChar;
+                Console.WriteLine();
+
+                switch (choice)
+                {
+                    case '1':
+                        Console.WriteLine("\nAll Contacts List:");
+                        addressBookInstance.DisplayContacts();
+                        break;
+                    case '2':
+                        addressBookInstance.AddContact(GetContactDetails());
+                        break;
+                    case '3':
+                        addressBookInstance.EditContactByName();
+                        break;
+                    case '4':
+                        addressBookInstance.DeleteContactByName();
+                        break;
+                    case '0':
+                        Console.WriteLine("Exiting...");
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter a valid option.");
+                        break;
+                }
+            } while (choice != '0');
+        }
+
+        public static Persons GetContactDetails()
+        {
             Console.WriteLine("\nAdding New Contact:");
             Console.Write("Enter First Name: ");
             string firstName = Console.ReadLine();
@@ -127,58 +161,20 @@
             Console.Write("Enter Address: ");
             string address = Console.ReadLine();
 
-            Console.Write("Enter City: ");
-            string city = Console.ReadLine();
-
-            Console.Write("Enter State: ");
-            string state = Console.ReadLine();
-
-            Console.Write("Enter Zip: ");
-            string zip = Console.ReadLine();
-
             Console.Write("Enter Phone Number: ");
             string phoneNumber = Console.ReadLine();
 
             Console.Write("Enter Email: ");
             string email = Console.ReadLine();
 
-            Contact newContact = addressBookInstance.CreateContact(firstName, lastName, address, city, state, zip, phoneNumber, email);
-            addressBookInstance.AddContact(newContact);
-
-            // Display all contacts
-            Console.WriteLine("\nAll Contacts:");
-            addressBookInstance.DisplayContacts();
-
-            // Editing existing contact
-            Console.WriteLine("\nEditing Contact:");
-            Console.Write("Enter First Name of Contact to Edit: ");
-            string editFirstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name of Contact to Edit: ");
-            string editLastName = Console.ReadLine();
-
-            addressBookInstance.EditContactByName(editFirstName, editLastName);
-
-
-            // Display all contacts after editing
-            Console.WriteLine("\nAll Contacts after Editing:");
-            addressBookInstance.DisplayContacts();
-
-
-
-            // Deleting contact
-            Console.WriteLine("\nDeleting Contact:");
-            Console.Write("Enter First Name of Contact to Delete: ");
-            string deleteFirstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name of Contact to Delete: ");
-            string deleteLastName = Console.ReadLine();
-
-            addressBookInstance.DeleteContactByName(deleteFirstName, deleteLastName);
-
-            // Display all contacts after deletion
-            Console.WriteLine("\nAll Contacts after Deletion:");
-            addressBookInstance.DisplayContacts();
+            return new Persons
+            {
+                First_name = firstName,
+                Last_name = lastName,
+                Address = address,
+                Number = phoneNumber,
+                Email = email
+            };
         }
 
         public void DisplayWelcomeMessage()
