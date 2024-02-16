@@ -1,4 +1,6 @@
-﻿namespace AddressBookApp
+﻿using System.Text.RegularExpressions;
+
+namespace AddressBookApp
 {
     // UC-1
     public class Persons
@@ -62,10 +64,27 @@
                 personToEdit.Address = Console.ReadLine();
 
                 Console.Write("Enter Phone Number: ");
-                personToEdit.Number = Console.ReadLine();
+                string phoneNumber = Console.ReadLine();
+
+                if (IsValidPhoneNumber(phoneNumber))
+                {
+                    personToEdit.Number = phoneNumber;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
+                }
 
                 Console.Write("Enter Email: ");
-                personToEdit.Email = Console.ReadLine();
+                string email = Console.ReadLine();
+                if (IsValidEmail(email))
+                {
+                    personToEdit.Email = email;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid email format. Please enter a valid email address.");
+                }
 
                 Console.WriteLine("Contact updated successfully.");
             }
@@ -99,6 +118,20 @@
         private Persons FindContactByName(string firstName, string lastName)
         {
             return contacts.Find(c => c.First_name.Equals(firstName, StringComparison.OrdinalIgnoreCase) && c.Last_name.Equals(lastName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            // Regex pattern for phone number (10 digits)
+            string pattern = @"^\d{10}$";
+            return Regex.IsMatch(phoneNumber, pattern);
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            // Regex pattern for email address
+            string pattern = @"^[a-z A-Z][\w \.]*\@[a-z A-Z 0-9]+\.[a-z]{2,3}$";
+            return Regex.IsMatch(email, pattern);
         }
     }
 
@@ -159,7 +192,9 @@
             }
 
             Console.Write("Enter the number for the Address Book to select: ");
+
             int index;
+
             if (int.TryParse(Console.ReadLine(), out index) && index > 0 && index <= addressBooks.Count)
             {
                 string selectedBook = addressBooks.Keys.ElementAt(index - 1);
@@ -224,8 +259,19 @@
             Console.Write("Enter Phone Number: ");
             string phoneNumber = Console.ReadLine();
 
+            if (!Regex.IsMatch(phoneNumber, @"^\d{10}$"))
+            {
+                Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
+                return null;
+            }
+
             Console.Write("Enter Email: ");
             string email = Console.ReadLine();
+            if (!Regex.IsMatch(email, @"^[a-z A-Z][\w ]*[\.]*\@[a-z A-Z 0-9]+\.[a-z]{2,3}$"))
+            {
+                Console.WriteLine("Invalid email format. Please enter a valid email address.");
+                return null;
+            }
 
             return new Persons
             {
@@ -236,6 +282,7 @@
                 Email = email
             };
         }
+
 
         public void DisplayWelcomeMessage()
         {
