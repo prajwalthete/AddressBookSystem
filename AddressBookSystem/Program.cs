@@ -1,15 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json;
 
 namespace AddressBookApp
 {
-    // UC-1
-    public class Persons
+    public class Person
     {
-        public string First_name { get; set; }
-        public string Last_name { get; set; }
-        public string Number { get; set; }
-        public string Email { get; set; }
-        public string Address { get; set; }
+        public string? First_name { get; set; }
+        public string? Last_name { get; set; }
+        public string? Number { get; set; }
+        public string? Email { get; set; }
+        public string? Address { get; set; }
 
         public override string ToString()
         {
@@ -19,37 +18,44 @@ namespace AddressBookApp
 
     public class AddressBook
     {
-        private List<Persons> contacts = new List<Persons>();
+        public List<Person> Contacts { get; set; }
 
-        public void AddContact(Persons person)
+        public AddressBook()
         {
-            contacts.Add(person);
+            Contacts = new List<Person>();
+        }
+
+        public void AddContact(Person person)
+        {
+            Contacts.Add(person);
+            SaveToFile("address_book_data.json"); // Save changes to file
         }
 
         public void DisplayContacts()
         {
-            if (contacts.Count > 0)
+            if (Contacts.Count > 0)
             {
-                foreach (var person in contacts)
+                foreach (var person in Contacts)
                 {
                     Console.WriteLine(person);
                 }
-
             }
-            else { Console.WriteLine("Your Contact list is empty"); }
-
+            else
+            {
+                Console.WriteLine("Your Contact list is empty");
+            }
         }
 
         public void EditContactByName()
         {
             Console.WriteLine("\nEditing Contact:");
             Console.Write("Enter First Name of Contact to Edit: ");
-            string editFirstName = Console.ReadLine();
+            string? editFirstName = Console.ReadLine();
 
             Console.Write("Enter Last Name of Contact to Edit: ");
-            string editLastName = Console.ReadLine();
+            string? editLastName = Console.ReadLine();
 
-            Persons personToEdit = FindContactByName(editFirstName, editLastName);
+            Person? personToEdit = FindContactByName(editFirstName, editLastName);
             if (personToEdit != null)
             {
                 Console.WriteLine("Enter new details to Update:");
@@ -64,7 +70,7 @@ namespace AddressBookApp
                 personToEdit.Address = Console.ReadLine();
 
                 Console.Write("Enter Phone Number: ");
-                string phoneNumber = Console.ReadLine();
+                string? phoneNumber = Console.ReadLine();
 
                 if (IsValidPhoneNumber(phoneNumber))
                 {
@@ -76,7 +82,7 @@ namespace AddressBookApp
                 }
 
                 Console.Write("Enter Email: ");
-                string email = Console.ReadLine();
+                string? email = Console.ReadLine();
                 if (IsValidEmail(email))
                 {
                     personToEdit.Email = email;
@@ -87,6 +93,7 @@ namespace AddressBookApp
                 }
 
                 Console.WriteLine("Contact updated successfully.");
+                SaveToFile("address_book_data.json"); // Save changes to file
             }
             else
             {
@@ -98,16 +105,17 @@ namespace AddressBookApp
         {
             Console.WriteLine("\nDeleting Contact:");
             Console.Write("Enter First Name of Contact to Delete: ");
-            string deleteFirstName = Console.ReadLine();
+            string? deleteFirstName = Console.ReadLine();
 
             Console.Write("Enter Last Name of Contact to Delete: ");
-            string deleteLastName = Console.ReadLine();
+            string? deleteLastName = Console.ReadLine();
 
-            Persons personToDelete = FindContactByName(deleteFirstName, deleteLastName);
+            Person? personToDelete = FindContactByName(deleteFirstName, deleteLastName);
             if (personToDelete != null)
             {
-                contacts.Remove(personToDelete);
+                Contacts.Remove(personToDelete);
                 Console.WriteLine("Contact deleted successfully.");
+                SaveToFile("address_book_data.json"); // Save changes to file
             }
             else
             {
@@ -115,32 +123,49 @@ namespace AddressBookApp
             }
         }
 
-        private Persons FindContactByName(string firstName, string lastName)
+        public void SaveToFile(string fileName)
         {
-            return contacts.Find(c => c.First_name.Equals(firstName, StringComparison.OrdinalIgnoreCase) && c.Last_name.Equals(lastName, StringComparison.OrdinalIgnoreCase));
+            string json = JsonConvert.SerializeObject(Contacts);
+            File.WriteAllText(fileName, json);
         }
 
-        private static bool IsValidPhoneNumber(string phoneNumber)
+        public void LoadFromFile(string fileName)
         {
-            // Regex pattern for phone number (10 digits)
+            if (File.Exists(fileName))
+            {
+                string json = File.ReadAllText(fileName);
+                Contacts = JsonConvert.DeserializeObject<List<Person>>(json) ?? new List<Person>();
+            }
+        }
+
+        private Person? FindContactByName(string? firstName, string? lastName)
+        {
+            return Contacts.Find(c => c.First_name?.Equals(firstName, StringComparison.OrdinalIgnoreCase) == true && c.Last_name?.Equals(lastName, StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        private static bool IsValidPhoneNumber(string? phoneNumber)
+        {
+            if (phoneNumber == null) return false;
             string pattern = @"^\d{10}$";
-            return Regex.IsMatch(phoneNumber, pattern);
+            return System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, pattern);
         }
 
-        private static bool IsValidEmail(string email)
+        private static bool IsValidEmail(string? email)
         {
-            // Regex pattern for email address
-            string pattern = @"^[a-z A-Z][\w \.]*\@[a-z A-Z 0-9]+\.[a-z]{2,3}$";
-            return Regex.IsMatch(email, pattern);
+            if (email == null) return false;
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
         }
     }
 
     public class AddressBookMain
     {
-        private static Dictionary<string, AddressBook> addressBooks = new Dictionary<string, AddressBook>();
+        private static List<(string name, AddressBook book)> addressBooks = new List<(string name, AddressBook book)>();
+        private const string dataFile = "address_book_data.json";
 
         public static void Main(string[] args)
         {
+            LoadAddressBookData();
             AddressBookMain addressBook = new AddressBookMain();
             addressBook.DisplayWelcomeMessage();
 
@@ -151,6 +176,7 @@ namespace AddressBookApp
                 Console.WriteLine("0 - Exit");
                 Console.WriteLine("1 - Add new Address Book");
                 Console.WriteLine("2 - Select Address Book");
+                Console.WriteLine("3 - Delete Address Book");
                 Console.Write("Enter your choice: ");
                 choice = Console.ReadKey().KeyChar;
                 Console.WriteLine();
@@ -163,6 +189,9 @@ namespace AddressBookApp
                     case '2':
                         SelectAddressBook();
                         break;
+                    case '3':
+                        DeleteAddressBook();
+                        break;
                     case '0':
                         Console.WriteLine("Exiting...");
                         break;
@@ -171,13 +200,44 @@ namespace AddressBookApp
                         break;
                 }
             } while (choice != '0');
+
+            SaveAddressBookData();
+        }
+
+        private static void LoadAddressBookData()
+        {
+            if (File.Exists(dataFile))
+            {
+                string json = File.ReadAllText(dataFile);
+                var addressBookData = JsonConvert.DeserializeObject<List<(string name, List<Person> contacts)>>(json);
+                if (addressBookData != null)
+                {
+                    foreach (var (name, contacts) in addressBookData)
+                    {
+                        var addressBook = new AddressBook { Contacts = contacts };
+                        addressBooks.Add((name, addressBook));
+                    }
+                }
+            }
+        }
+
+        private static void SaveAddressBookData()
+        {
+            var dataToSave = new List<(string name, List<Person> contacts)>();
+            foreach (var (name, book) in addressBooks)
+            {
+                dataToSave.Add((name, book.Contacts));
+            }
+            string json = JsonConvert.SerializeObject(dataToSave);
+            File.WriteAllText(dataFile, json);
         }
 
         private static void AddAddressBook()
         {
             Console.Write("Enter Name for the new Address Book: ");
             string name = Console.ReadLine();
-            addressBooks.Add(name, new AddressBook());
+            var newAddressBook = new AddressBook();
+            addressBooks.Add((name, newAddressBook));
             Console.WriteLine($"Address Book '{name}' added successfully.");
         }
 
@@ -185,22 +245,20 @@ namespace AddressBookApp
         {
             Console.WriteLine("\nSelect Address Book:");
             int count = 1;
-            foreach (var name in addressBooks.Keys)
+            foreach (var (name, _) in addressBooks)
             {
                 Console.WriteLine($"{count}. {name}");
                 count++;
             }
 
             Console.Write("Enter the number for the Address Book to select: ");
-
             int index;
-
             if (int.TryParse(Console.ReadLine(), out index) && index > 0 && index <= addressBooks.Count)
             {
-                string selectedBook = addressBooks.Keys.ElementAt(index - 1);
+                string selectedBook = addressBooks[index - 1].name;
                 Console.WriteLine($"\nSelected Address Book: {selectedBook}");
 
-                AddressBook selectedAddressBook = addressBooks[selectedBook];
+                AddressBook selectedAddressBook = addressBooks[index - 1].book;
                 char choice;
                 do
                 {
@@ -244,7 +302,32 @@ namespace AddressBookApp
             }
         }
 
-        public static Persons GetContactDetails()
+        private static void DeleteAddressBook()
+        {
+            Console.WriteLine("\nDelete Address Book:");
+            int count = 1;
+            foreach (var (name, _) in addressBooks)
+            {
+                Console.WriteLine($"{count}. {name}");
+                count++;
+            }
+
+            Console.Write("Enter the number for the Address Book to delete: ");
+            int index;
+            if (int.TryParse(Console.ReadLine(), out index) && index > 0 && index <= addressBooks.Count)
+            {
+                string deletedBookName = addressBooks[index - 1].name;
+                addressBooks.RemoveAt(index - 1);
+                Console.WriteLine($"\nAddress Book '{deletedBookName}' deleted successfully.");
+                SaveAddressBookData(); // Save changes to file
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection. Please enter a valid number.");
+            }
+        }
+
+        private static Person GetContactDetails()
         {
             Console.WriteLine("\nAdding New Contact:");
             Console.Write("Enter First Name: ");
@@ -259,21 +342,21 @@ namespace AddressBookApp
             Console.Write("Enter Phone Number: ");
             string phoneNumber = Console.ReadLine();
 
-            if (!Regex.IsMatch(phoneNumber, @"^\d{10}$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^\d{10}$"))
             {
                 Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
-                return null;
+                return new Person();
             }
 
             Console.Write("Enter Email: ");
             string email = Console.ReadLine();
-            if (!Regex.IsMatch(email, @"^[a-z A-Z][\w ]*[\.]*\@[a-z A-Z 0-9]+\.[a-z]{2,3}$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
             {
                 Console.WriteLine("Invalid email format. Please enter a valid email address.");
-                return null;
+                return new Person();
             }
 
-            return new Persons
+            return new Person
             {
                 First_name = firstName,
                 Last_name = lastName,
@@ -282,6 +365,8 @@ namespace AddressBookApp
                 Email = email
             };
         }
+
+
 
 
         public void DisplayWelcomeMessage()
