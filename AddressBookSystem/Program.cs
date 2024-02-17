@@ -330,8 +330,17 @@ namespace AddressBookApp
         private static Person GetContactDetails()
         {
             Console.WriteLine("\nAdding New Contact:");
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine();
+
+            string firstName;
+            do
+            {
+                Console.Write("Enter First Name: ");
+                firstName = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(firstName))
+                {
+                    Console.WriteLine("First Name cannot be empty. Please enter a valid First Name.");
+                }
+            } while (string.IsNullOrWhiteSpace(firstName));
 
             Console.Write("Enter Last Name: ");
             string lastName = Console.ReadLine();
@@ -365,6 +374,7 @@ namespace AddressBookApp
                 Email = email
             };
         }
+
 
 
 
