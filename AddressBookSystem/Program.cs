@@ -4,15 +4,36 @@ namespace AddressBookApp
 {
     public class Person
     {
-        public string? First_name { get; set; }
-        public string? Last_name { get; set; }
-        public string? Number { get; set; }
-        public string? Email { get; set; }
-        public string? Address { get; set; }
+
+        public string First_name { get; set; }
+
+        public string Last_name { get; set; }
+
+        public string Number { get; set; }
+
+        public string Email { get; set; }
+        public string Address { get; set; }
 
         public override string ToString()
         {
             return $"| Name: {First_name} {Last_name} | Mobile: {Number} | Email: {Email} | Address: {Address} |";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            Person other = (Person)obj;
+            return First_name.Equals(other.First_name, StringComparison.OrdinalIgnoreCase) &&
+                   Last_name.Equals(other.Last_name, StringComparison.OrdinalIgnoreCase) &&
+                   Email.Equals(other.Email, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(First_name, Last_name, Number, Email, Address);
         }
     }
 
@@ -25,10 +46,16 @@ namespace AddressBookApp
             Contacts = new List<Person>();
         }
 
-        public void AddContact(Person person)
+        public bool AddContact(Person person)
         {
+            if (Contacts.Contains(person))
+            {
+                Console.WriteLine("Contact already exists.");
+                return false;
+            }
             Contacts.Add(person);
             SaveToFile("address_book_data.json"); // Save changes to file
+            return true;
         }
 
         public void DisplayContacts()
@@ -45,7 +72,6 @@ namespace AddressBookApp
                 Console.WriteLine("Your Contact list is empty");
             }
         }
-
         public void EditContactByName()
         {
             Console.WriteLine("\nEditing Contact:");
@@ -375,13 +401,10 @@ namespace AddressBookApp
             };
         }
 
-
-
-
-
         public void DisplayWelcomeMessage()
         {
             Console.WriteLine("Welcome to Address Book Program....!");
         }
     }
 }
+
