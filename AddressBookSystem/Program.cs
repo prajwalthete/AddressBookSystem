@@ -4,13 +4,9 @@ namespace AddressBookApp
 {
     public class Person
     {
-
         public string First_name { get; set; }
-
         public string Last_name { get; set; }
-
         public string Number { get; set; }
-
         public string Email { get; set; }
         public string Address { get; set; }
 
@@ -48,14 +44,20 @@ namespace AddressBookApp
 
         public bool AddContact(Person person)
         {
-            if (Contacts.Contains(person))
+            if (ContactExists(person))
             {
-                Console.WriteLine("Contact already exists.");
+                Console.WriteLine("Contact with the same email or phone number already exists. Please enter unique email and phone.");
                 return false;
             }
             Contacts.Add(person);
             SaveToFile("address_book_data.json"); // Save changes to file
             return true;
+        }
+
+        private bool ContactExists(Person person)
+        {
+            return Contacts.Any(c => c.Email.Equals(person.Email, StringComparison.OrdinalIgnoreCase) ||
+                                      c.Number.Equals(person.Number, StringComparison.OrdinalIgnoreCase));
         }
 
         public void DisplayContacts()
@@ -72,54 +74,90 @@ namespace AddressBookApp
                 Console.WriteLine("Your Contact list is empty");
             }
         }
+
         public void EditContactByName()
         {
             Console.WriteLine("\nEditing Contact:");
             Console.Write("Enter First Name of Contact to Edit: ");
-            string? editFirstName = Console.ReadLine();
+            string editFirstName = Console.ReadLine();
 
             Console.Write("Enter Last Name of Contact to Edit: ");
-            string? editLastName = Console.ReadLine();
+            string editLastName = Console.ReadLine();
 
-            Person? personToEdit = FindContactByName(editFirstName, editLastName);
+            Person personToEdit = FindContactByName(editFirstName, editLastName);
             if (personToEdit != null)
             {
-                Console.WriteLine("Enter new details to Update:");
+                Console.WriteLine("Select what you want to update:");
+                Console.WriteLine("1. First Name");
+                Console.WriteLine("2. Last Name");
+                Console.WriteLine("3. Address");
+                Console.WriteLine("4. Phone Number");
+                Console.WriteLine("5. Email");
 
-                Console.Write("Enter first Name :");
-                personToEdit.First_name = Console.ReadLine();
+                Console.Write("Enter your choice: ");
+                char choice = Console.ReadKey().KeyChar;
+                Console.WriteLine();
 
-                Console.Write("Enter last Name :");
-                personToEdit.Last_name = Console.ReadLine();
-
-                Console.Write("Enter Address: ");
-                personToEdit.Address = Console.ReadLine();
-
-                Console.Write("Enter Phone Number: ");
-                string? phoneNumber = Console.ReadLine();
-
-                if (IsValidPhoneNumber(phoneNumber))
+                switch (choice)
                 {
-                    personToEdit.Number = phoneNumber;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
+                    case '1':
+                        Console.Write("Enter new First Name: ");
+                        string newFirstName = Console.ReadLine();
+                        personToEdit.First_name = newFirstName;
+                        break;
+                    case '2':
+                        Console.Write("Enter new Last Name: ");
+                        string newLastName = Console.ReadLine();
+                        personToEdit.Last_name = newLastName;
+                        break;
+                    case '3':
+                        Console.Write("Enter new Address: ");
+                        string newAddress = Console.ReadLine();
+                        personToEdit.Address = newAddress;
+                        break;
+                    case '4':
+                        do
+                        {
+                            Console.Write("Enter new Phone Number: ");
+                            string newPhoneNumber = Console.ReadLine();
+
+                            if (!IsValidPhoneNumber(newPhoneNumber))
+                            {
+                                Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
+                            }
+                            else if (Contacts.Any(c => c.Number.Equals(newPhoneNumber, StringComparison.OrdinalIgnoreCase) && c != personToEdit))
+                            {
+                                Console.WriteLine("A contact with this phone number already exists. Please enter a unique phone number.");
+                            }
+                            else
+                            {
+                                personToEdit.Number = newPhoneNumber;
+                            }
+                        } while (!IsValidPhoneNumber(personToEdit.Number));
+                        break;
+                    case '5':
+                        Console.Write("Enter new Email: ");
+                        string newEmail = Console.ReadLine();
+                        if (!IsValidEmail(newEmail))
+                        {
+                            Console.WriteLine("Invalid email format. Please enter a valid email address.");
+                        }
+                        else if (Contacts.Any(c => c.Email.Equals(newEmail, StringComparison.OrdinalIgnoreCase) && c != personToEdit))
+                        {
+                            Console.WriteLine("A contact with this email already exists. Please enter a new email.");
+                        }
+                        else
+                        {
+                            personToEdit.Email = newEmail;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. No updates performed.");
+                        return;
                 }
 
-                Console.Write("Enter Email: ");
-                string? email = Console.ReadLine();
-                if (IsValidEmail(email))
-                {
-                    personToEdit.Email = email;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid email format. Please enter a valid email address.");
-                }
+                SaveToFile("address_book_data.json");
 
-                Console.WriteLine("Contact updated successfully.");
-                SaveToFile("address_book_data.json"); // Save changes to file
             }
             else
             {
@@ -127,16 +165,18 @@ namespace AddressBookApp
             }
         }
 
+
+
         public void DeleteContactByName()
         {
             Console.WriteLine("\nDeleting Contact:");
             Console.Write("Enter First Name of Contact to Delete: ");
-            string? deleteFirstName = Console.ReadLine();
+            string deleteFirstName = Console.ReadLine();
 
             Console.Write("Enter Last Name of Contact to Delete: ");
-            string? deleteLastName = Console.ReadLine();
+            string deleteLastName = Console.ReadLine();
 
-            Person? personToDelete = FindContactByName(deleteFirstName, deleteLastName);
+            Person personToDelete = FindContactByName(deleteFirstName, deleteLastName);
             if (personToDelete != null)
             {
                 Contacts.Remove(personToDelete);
@@ -164,19 +204,20 @@ namespace AddressBookApp
             }
         }
 
-        private Person? FindContactByName(string? firstName, string? lastName)
+        private Person FindContactByName(string firstName, string lastName)
         {
-            return Contacts.Find(c => c.First_name?.Equals(firstName, StringComparison.OrdinalIgnoreCase) == true && c.Last_name?.Equals(lastName, StringComparison.OrdinalIgnoreCase) == true);
+            return Contacts.Find(c => c.First_name.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
+                                      c.Last_name.Equals(lastName, StringComparison.OrdinalIgnoreCase));
         }
 
-        private static bool IsValidPhoneNumber(string? phoneNumber)
+        private static bool IsValidPhoneNumber(string phoneNumber)
         {
             if (phoneNumber == null) return false;
             string pattern = @"^\d{10}$";
             return System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, pattern);
         }
 
-        private static bool IsValidEmail(string? email)
+        private static bool IsValidEmail(string email)
         {
             if (email == null) return false;
             string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
@@ -374,18 +415,22 @@ namespace AddressBookApp
             Console.Write("Enter Address: ");
             string address = Console.ReadLine();
 
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine();
-
-            if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^\d{10}$"))
+            string phoneNumber;
+            do
             {
-                Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
-                return new Person();
-            }
+                Console.Write("Enter Phone Number: ");
+                phoneNumber = Console.ReadLine();
+
+                if (!IsValidPhoneNumber(phoneNumber))
+                {
+                    Console.WriteLine("Invalid phone number format. Please enter a valid phone number.");
+                    phoneNumber = null; // Reset phoneNumber to null to repeat the loop
+                }
+            } while (string.IsNullOrWhiteSpace(phoneNumber));
 
             Console.Write("Enter Email: ");
             string email = Console.ReadLine();
-            if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+            if (!IsValidEmail(email))
             {
                 Console.WriteLine("Invalid email format. Please enter a valid email address.");
                 return new Person();
@@ -405,6 +450,19 @@ namespace AddressBookApp
         {
             Console.WriteLine("Welcome to Address Book Program....!");
         }
+
+        private static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            if (phoneNumber == null) return false;
+            string pattern = @"^\d{10}$";
+            return System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, pattern);
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (email == null) return false;
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
+        }
     }
 }
-
