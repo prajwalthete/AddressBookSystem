@@ -50,7 +50,7 @@ namespace AddressBookApp
                 return false;
             }
             Contacts.Add(person);
-            SaveToFile("address_book_data.json"); // Save changes to file
+            SaveToFile("address_book_data.json");
             return true;
         }
 
@@ -78,13 +78,35 @@ namespace AddressBookApp
         public void EditContactByName()
         {
             Console.WriteLine("\nEditing Contact:");
-            Console.Write("Enter First Name of Contact to Edit: ");
-            string editFirstName = Console.ReadLine();
 
-            Console.Write("Enter Last Name of Contact to Edit: ");
-            string editLastName = Console.ReadLine();
+            Console.WriteLine("Select how you want to search for the contact:");
+            Console.WriteLine("1. Search by Email");
+            Console.WriteLine("2. Search by First Name and Last Name");
+            Console.Write("Enter your choice: ");
+            char searchChoice = Console.ReadKey().KeyChar;
+            Console.WriteLine();
 
-            Person personToEdit = FindContactByName(editFirstName, editLastName);
+            Person personToEdit = null;
+            switch (searchChoice)
+            {
+                case '1':
+                    Console.Write("Enter Email of Contact to Edit: ");
+                    string editEmail = Console.ReadLine();
+                    personToEdit = FindContactByEmail(editEmail);
+                    break;
+                case '2':
+                    Console.Write("Enter First Name of Contact to Edit: ");
+                    string editFirstName = Console.ReadLine();
+
+                    Console.Write("Enter Last Name of Contact to Edit: ");
+                    string editLastName = Console.ReadLine();
+                    personToEdit = FindContactByName(editFirstName, editLastName);
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. No updates performed.");
+                    return;
+            }
+
             if (personToEdit != null)
             {
                 Console.WriteLine("Select what you want to update:");
@@ -170,13 +192,50 @@ namespace AddressBookApp
         public void DeleteContactByName()
         {
             Console.WriteLine("\nDeleting Contact:");
-            Console.Write("Enter First Name of Contact to Delete: ");
-            string deleteFirstName = Console.ReadLine();
 
-            Console.Write("Enter Last Name of Contact to Delete: ");
-            string deleteLastName = Console.ReadLine();
+            Console.WriteLine("Select how you want to search for the contact:");
+            Console.WriteLine("1. Search by Email");
+            Console.WriteLine("2. Search by Mobile Number");
+            Console.Write("Enter your choice: ");
+            char searchChoice = Console.ReadKey().KeyChar;
+            Console.WriteLine();
 
-            Person personToDelete = FindContactByName(deleteFirstName, deleteLastName);
+            switch (searchChoice)
+            {
+                case '1':
+                    Console.Write("Enter Email of Contact to Delete: ");
+                    string deleteEmail = Console.ReadLine();
+                    DeleteContactByEmail(deleteEmail);
+                    break;
+                case '2':
+                    Console.Write("Enter Mobile Number of Contact to Delete: ");
+                    string deleteMobileNumber = Console.ReadLine();
+                    DeleteContactByMobileNumber(deleteMobileNumber);
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. No contact deleted.");
+                    break;
+            }
+        }
+
+        public void DeleteContactByEmail(string email)
+        {
+            Person personToDelete = Contacts.FirstOrDefault(c => c.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            if (personToDelete != null)
+            {
+                Contacts.Remove(personToDelete);
+                Console.WriteLine("Contact deleted successfully.");
+                SaveToFile("address_book_data.json");
+            }
+            else
+            {
+                Console.WriteLine("Contact not found.");
+            }
+        }
+
+        public void DeleteContactByMobileNumber(string mobileNumber)
+        {
+            Person personToDelete = Contacts.FirstOrDefault(c => c.Number.Equals(mobileNumber, StringComparison.OrdinalIgnoreCase));
             if (personToDelete != null)
             {
                 Contacts.Remove(personToDelete);
@@ -188,6 +247,8 @@ namespace AddressBookApp
                 Console.WriteLine("Contact not found.");
             }
         }
+
+
 
         public void SaveToFile(string fileName)
         {
@@ -208,6 +269,11 @@ namespace AddressBookApp
         {
             return Contacts.Find(c => c.First_name.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
                                       c.Last_name.Equals(lastName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private Person FindContactByEmail(string email)
+        {
+            return Contacts.Find(c => c.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
         }
 
         private static bool IsValidPhoneNumber(string phoneNumber)
